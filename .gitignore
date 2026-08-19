@@ -4,6 +4,7 @@
 
 # مخرجات التوليد (فيديوهات كبيرة — لا تُرفع إلى git)
 outputs/
+video_assets/
 *.mp4
 *.mov
 *.webm
