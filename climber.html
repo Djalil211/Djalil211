@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, initial-scale=1.0" />
+  <title>رجل الطريق الخشبي — بث TikTok</title>
+  <style>
+:root{ --neon-c:#22e7ff; --neon-m:#ff2d95; --neon-g:#ffd23f; --text:#fff; --muted:#cdbfe6; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:var(--text)}
+html,body{background:transparent}                                  /* شفافة للبث */
+body.solid{background:radial-gradient(120% 80% at 80% -10%,#1c3a2e 0%,#0a1a14 45%,#04100a 100%)}
+button,input{font-family:inherit}
+
+/* ===== شاشة البداية ===== */
+.start{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:24px;background:rgba(3,12,8,.92);backdrop-filter:blur(6px)}
+.start.hidden{display:none}
+.start-card{width:min(96%,560px);text-align:center;background:linear-gradient(160deg,#103024,#06160f);
+  border:1px solid rgba(255,255,255,.16);border-radius:26px;padding:30px;box-shadow:0 0 60px rgba(34,231,255,.2)}
+.start-card h2{font-size:26px;background:linear-gradient(90deg,var(--neon-g),var(--neon-m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.start-sub{color:var(--muted);font-size:14px;margin:8px 0 18px}
+.name-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);border-radius:14px;
+  padding:13px 16px;color:#fff;font-size:16px;text-align:center;margin-bottom:14px}
+.start-btn{background:linear-gradient(135deg,var(--neon-c),#00a3ff);color:#04121a;padding:15px 30px;border-radius:18px;
+  font-size:18px;font-weight:900;border:none;cursor:pointer;box-shadow:0 0 22px rgba(34,231,255,.55)}
+.start-note{color:var(--muted);font-size:12px;margin-top:14px}
+
+/* ===== اللوحة ===== */
+.stage{position:absolute;inset:18px;display:flex;flex-direction:column;
+  background:linear-gradient(160deg,rgba(8,24,16,.9),rgba(4,14,10,.84));border:1px solid rgba(255,255,255,.18);
+  border-radius:28px;padding:18px;box-shadow:0 18px 55px rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+.live-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.live-badge{display:flex;align-items:center;gap:7px;background:var(--neon-m);color:#fff;font-weight:800;font-size:15px;padding:6px 13px;border-radius:10px;box-shadow:0 0 16px rgba(255,45,149,.6)}
+.live-dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.viewers{font-size:15px;font-weight:800;background:rgba(0,0,0,.5);padding:6px 13px;border-radius:10px}
+.brand{font-size:21px;font-weight:900;margin-left:6px;background:linear-gradient(90deg,var(--neon-g),var(--neon-m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.icon-btn{margin-left:auto;width:42px;height:42px;border-radius:50%;font-size:19px;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.18);cursor:pointer}
+
+/* ===== المشهد ===== */
+.scene{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:18px;
+  background:linear-gradient(180deg,#0d2a1c 0%,#082018 60%,#02100a 100%)}
+.path{position:absolute;left:50%;top:0;bottom:0;width:var(--pw,520px);transform:translateX(-50%);
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.32) 0 3px,transparent 3px 46px,rgba(0,0,0,.32) 46px 50px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 20px,transparent 20px 40px),
+    linear-gradient(#7a4a22,#4f2e12);
+  border:5px solid #2a1808;border-radius:12px;box-shadow:0 0 30px rgba(0,0,0,.5)}
+.summit{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:46px;z-index:7;
+  filter:drop-shadow(0 0 10px var(--neon-g))}
+.abyss{position:absolute;left:0;right:0;bottom:0;height:54px;z-index:4;
+  background:linear-gradient(transparent,#000 75%);border-top:2px dashed rgba(255,255,255,.12)}
+
+/* الرجل السمين */
+.climber{position:absolute;left:0;bottom:0;width:74px;height:96px;z-index:6;will-change:left,bottom,transform;
+  transform:translateX(-50%)}
+.climber .head{width:48px;height:48px;border-radius:50%;background:#f4c08a;margin:0 auto;display:grid;
+  place-items:center;font-size:30px;border:3px solid #d99a5b;box-shadow:inset -3px -3px 0 rgba(0,0,0,.12)}
+.climber .belly{width:70px;height:56px;border-radius:50% 50% 46% 46%;background:linear-gradient(#ff6b6b,#c62828);
+  margin:-10px auto 0;border:3px solid #b71c1c;box-shadow:inset -5px -5px 0 rgba(0,0,0,.14)}
+.climber.climbing{animation:sway 1s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:translateX(-50%) rotate(-4deg)}50%{transform:translateX(-50%) rotate(4deg)}}
+.climber.falling{animation:fall .9s cubic-bezier(.4,0,1,1) forwards}
+@keyframes fall{0%{transform:translateX(-50%) rotate(0)}100%{transform:translateX(-50%) translateY(90vh) rotate(720deg);opacity:0}}
+.climber.hit .head{animation:hurt .4s}
+@keyframes hurt{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* المركّبات الساقطة */
+.vehicle{position:absolute;font-size:50px;z-index:8;will-change:top,transform;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+.vehicle.spin{animation:vspin .6s linear infinite}
+@keyframes vspin{to{transform:rotate(360deg)}}
+
+/* ===== الطبقات العائمة ===== */
+.chat-layer{position:fixed;left:24px;bottom:140px;z-index:30;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:330px;max-width:36%}
+.chat-msg{align-self:flex-start;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;padding:8px 14px;font-size:16px;animation:cin .35s ease,cout .5s ease 6s forwards}
+.chat-msg b{color:var(--neon-c)}
+@keyframes cin{from{opacity:0;transform:translateX(-20px)}to{opacity:1}}
+@keyframes cout{to{opacity:0;transform:translateX(-20px)}}
+.gift-layer{position:fixed;inset:0;z-index:35;pointer-events:none}
+.gift-pop{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%) scale(.2);
+  background:linear-gradient(135deg,var(--neon-m),#7a1bff);color:#fff;padding:16px 26px;border-radius:22px;font-weight:800;
+  text-align:center;box-shadow:0 0 46px rgba(255,45,149,.75);animation:gpop 2.6s ease forwards}
+.gift-pop .emoji{font-size:54px;display:block}
+@keyframes gpop{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}16%{transform:translate(-50%,-50%) scale(1.12);opacity:1}30%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{transform:translate(-50%,-85%);opacity:0}}
+.heart-layer{position:fixed;right:26px;bottom:140px;z-index:25;pointer-events:none;width:74px;height:60%}
+.heart{position:absolute;bottom:0;font-size:24px;animation:fu linear forwards}
+@keyframes fu{0%{transform:translate(0,0) scale(.6);opacity:0}12%{opacity:1}100%{transform:translate(var(--dx,-10px),-60vh) scale(1.1);opacity:0}}
+.confetti{position:fixed;inset:0;z-index:60;pointer-events:none}
+
+/* ===== HUD ===== */
+.hud{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.prog-wrap{position:relative;height:20px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.16);border-radius:12px;overflow:hidden}
+.prog-bar{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--neon-c),var(--neon-g));transition:width .1s linear}
+.prog-label{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000}
+.stats{display:flex;gap:18px;justify-content:center;font-size:14px;color:var(--muted)}
+.stats b{color:var(--neon-g);font-size:17px}
+.dist{color:var(--neon-c)!important}
+.hint{margin-top:6px;text-align:center;color:var(--muted);font-size:14px}
+.keys{display:flex;gap:6px;justify-content:center;margin-top:4px}
+.key{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:4px 9px;font-size:12px;font-weight:700}
+.key.live{background:linear-gradient(135deg,var(--neon-c),#00a3ff);color:#04121a}
+
+.winner{position:fixed;inset:0;z-index:70;display:grid;place-items:center;pointer-events:none}
+.winner.hidden{display:none}
+.winner-flag{font-size:92px;animation:tB 1.2s ease infinite;filter:drop-shadow(0 0 30px rgba(255,210,63,.6))}
+@keyframes tB{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.winner-name{font-size:44px;font-weight:900;background:linear-gradient(90deg,var(--neon-g),var(--neon-c));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+</style>
+</head>
+<body>
+  <!-- ===== شاشة البداية ===== -->
+  <div id="start" class="start">
+    <div class="start-card">
+      <h2>🧗🪵 رجل الطريق الخشبي</h2>
+      <p class="start-sub">الهدايا تُسقط عليه المركّبات وتُعيده للصفر — بدون هدايا يصل للقمة ويفوز 🏆</p>
+      <input id="streamer-name" class="name-input" placeholder="✍️ اسمك في البث (اختياري)" />
+      <button id="begin" class="start-btn">ابدأ البث 🎬</button>
+      <p class="start-note" id="mode-note"></p>
+    </div>
+  </div>
+
+  <!-- ===== الطبقات العائمة ===== -->
+  <div id="chat-layer" class="chat-layer"></div>
+  <div id="gift-layer" class="gift-layer"></div>
+  <div id="heart-layer" class="heart-layer"></div>
+  <canvas id="confetti" class="confetti"></canvas>
+
+  <!-- ===== لوحة اللعبة ===== -->
+  <div class="stage">
+    <header class="live-bar">
+      <div class="live-badge"><span class="live-dot"></span> مباشر</div>
+      <div class="viewers"><span id="viewer-count">0</span> 👁</div>
+      <div class="brand" id="brand-name">🧗 رجل الطريق الخشبي</div>
+      <button id="bg-toggle" class="icon-btn" title="تبديل الخلفية">🖼️</button>
+      <button id="reset" class="icon-btn" title="إعادة">🔄</button>
+    </header>
+
+    <div class="scene" id="scene">
+      <div class="path">
+        <div class="summit">🏆</div>
+      </div>
+      <div class="abyss"></div>
+      <div class="climber" id="climber">
+        <div class="head">😆</div>
+        <div class="belly"></div>
+        <div class="arms"></div>
+      </div>
+      <div class="vehicles" id="vehicles"></div>
+    </div>
+
+    <div class="hud">
+      <div class="prog-wrap"><div class="prog-bar" id="prog"></div><span class="prog-label">التقدّم للقمة</span></div>
+      <div class="stats">
+        <span>طرح: <b id="knockdowns">0</b></span>
+        <span>هدايا: <b id="gifts">0</b></span>
+        <span class="dist" id="dist">للقمة: 100%</span>
+      </div>
+    </div>
+    <div class="hint">💡 أرسلوا هدايا لطرح الرجل عن الطريق! بدون هدايا يصل للقمة ويفوز 🏆</div>
+  </div>
+
+  <div id="winner" class="winner hidden">
+    <div class="winner-flag">🏆</div>
+    <div class="winner-name">وصل للقمة! فاز!</div>
+  </div>
+
+  <script>
+/* ====================================================================
+   رجل الطريق الخشبي — مدفوعة بأحداث TikTok + تحكم بالكيبورد للتفادي
+   ==================================================================== */
+"use strict";
+
+const scene=document.getElementById("scene");
+const pathEl=scene.querySelector(".path");
+const climber=document.getElementById("climber");
+const vehiclesEl=document.getElementById("vehicles");
+const elViewers=document.getElementById("viewer-count");
+const elKD=document.getElementById("knockdowns");
+const elGifts=document.getElementById("gifts");
+const elProg=document.getElementById("prog");
+const elDist=document.getElementById("dist");
+const elChat=document.getElementById("chat-layer");
+const elGift=document.getElementById("gift-layer");
+const elHeart=document.getElementById("heart-layer");
+const elWinner=document.getElementById("winner");
+const elStart=document.getElementById("start");
+const elBegin=document.getElementById("begin");
+const elName=document.getElementById("streamer-name");
+const elModeNote=document.getElementById("mode-note");
+const cv=document.getElementById("confetti"); const cx=cv.getContext("2d");
+
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const USERS=["ahmed","sara","khaled","nour","yassine","lina","omar","maya","riadh","amani","bilal","hadjer","walid","farah"];
+const PHRASES=["اسقطوه! 😂","طرحوه!","لا وصل! 🔥","go go","شاحنة عليه 🚚","هديه هدية!","🍉","خخخ","لايك لايك","سيارة عليه 🚗"];
+
+/* الحالة */
+const S={ progress:0, x:300, climbing:false, falling:false, won:false, knockdowns:0, gifts:0,
+  climbSpeed:0.022, rockKnockback:0.07, viewers:0, realMode:false, started:false };
+let playW=520, sceneW=800, sceneH=500, pathLeft=140, fallSpeed=500, moveSpeed=500;
+const climberH=96;
+let obstacles=[];
+const keys={};
+
+/* ===== القياس ===== */
+function measure(){
+  const r=scene.getBoundingClientRect();
+  sceneW=r.width; sceneH=r.height;
+  playW=Math.min(sceneW-24,560);
+  pathEl.style.setProperty("--pw",playW+"px");
+  pathLeft=(sceneW-playW)/2;
+  fallSpeed=sceneH*0.95;
+  moveSpeed=playW*1.0;
+  S.x=clamp(S.x,30,playW-30);
+}
+window.addEventListener("resize",()=>{measure();placeClimber();});
+function climberTopY(){ return sceneH - S.progress*(sceneH-climberH-90) - climberH; }
+function placeClimber(){
+  climber.style.left=(pathLeft+S.x)+"px";
+  climber.style.bottom=(S.progress*(sceneH-climberH-90))+"px";
+}
+
+/* ===== شاشة البداية ===== */
+elBegin.addEventListener("click",()=>{
+  const nm=(elName.value||new URLSearchParams(location.search).get("name")||"").trim();
+  document.getElementById("brand-name").textContent= nm?("🧗 "+nm):"🧗 رجل الطريق الخشبي";
+  elStart.classList.add("hidden");
+  S.started=true; S.climbing=true; climber.classList.add("climbing");
+  measure(); S.x=playW/2; placeClimber();
+  connectOrSim();
+  requestAnimationFrame(loop);
+});
+if(new URLSearchParams(location.search).get("solid")==="1") document.body.classList.add("solid");
+if(new URLSearchParams(location.search).get("name")) elName.value=new URLSearchParams(location.search).get("name");
+document.getElementById("bg-toggle").addEventListener("click",()=>document.body.classList.toggle("solid"));
+document.getElementById("reset").addEventListener("click",()=>{ S.won=false;S.falling=false;S.progress=0;S.x=playW/2;S.knockdowns=0;elKD.textContent=0;elWinner.classList.add("hidden");climber.classList.add("climbing"); });
+
+/* ===== لوحة المفاتيح (الأسهم + WASD) ===== */
+const CTRL=["arrowleft","arrowright","arrowup","arrowdown","a","d","w","s"," "];
+window.addEventListener("keydown",e=>{const k=e.key.toLowerCase(); if(CTRL.includes(k)){e.preventDefault();keys[k]=true;}});
+window.addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;});
+window.addEventListener("blur",()=>{for(const k in keys)keys[k]=false;});
+function isKey(...arr){return arr.some(k=>keys[k]);}
+
+/* ===== ذكاء التفادي (للمعاينة/المحاكاة فقط) ===== */
+function aiDodge(dt){
+  const cy=climberTopY();
+  let threat=null,best=Infinity;
+  obstacles.forEach(o=>{ if(!o.checked && o.y<cy){const d=Math.abs(o.x-S.x); if(d<best){best=d;threat=o;}} });
+  let target;
+  if(threat && Math.abs(threat.x-S.x)<72){ target = threat.x<S.x ? playW-30 : 30; }
+  else target=playW/2;
+  const dir=Math.sign(target-S.x)||0;
+  return clamp(S.x+dir*moveSpeed*0.7*dt,30,playW-30);
+}
+
+/* ===== توليد العوائق ===== */
+function spawnObstacle(emoji,full,aimed){
+  const el=document.createElement("div"); el.className="vehicle"+(full?" spin":""); el.textContent=emoji;
+  el.style.top="0px";
+  let xv;
+  if(aimed && Math.random()<0.55) xv=clamp(S.x+rnd(-26,26),30,playW-30);
+  else xv=rnd(30,playW-30);
+  el.style.left=(pathLeft+xv)+"px";
+  vehiclesEl.appendChild(el);
+  obstacles.push({el,x:xv,y:0,full,checked:false});
+}
+
+/* ===== الاصطدام ===== */
+function doHit(o){
+  if(o){o.checked=true;o.el.remove();}
+  S.knockdowns++; elKD.textContent=S.knockdowns;
+  S.falling=true; S.climbing=false;
+  climber.classList.remove("climbing"); climber.classList.add("falling");
+  shake();
+  setTimeout(()=>{ climber.classList.remove("falling"); S.progress=0; S.x=playW/2; S.falling=false; S.climbing=true; climber.classList.add("climbing"); placeClimber(); },900);
+}
+function smallKnock(o){
+  if(o){o.checked=true;o.el.remove();}
+  S.progress=Math.max(0,S.progress-S.rockKnockback);
+  shake(true);
+}
+function shake(small){ const st=document.querySelector(".stage"); st.classList.remove("shake","shake-s"); void st.offsetWidth; st.classList.add(small?"shake-s":"shake"); }
+// (animation classes added via CSS below at runtime if needed)
+const stEl=document.querySelector(".stage");
+const shakeStyle=document.createElement("style");
+shakeStyle.textContent=".stage.shake{animation:shk .4s}.stage.shake-s{animation:shk .2s}@keyframes shk{0%,100%{transform:translate(0,0)}25%{transform:translate(-6px,3px)}50%{transform:translate(5px,-3px)}75%{transform:translate(-3px,2px)}}";
+document.head.appendChild(shakeStyle);
+
+/* ===== الفوز ===== */
+function win(){
+  S.won=true; S.climbing=false; climber.classList.remove("climbing");
+  elWinner.classList.remove("hidden"); confetti();
+  setTimeout(()=>{ elWinner.classList.add("hidden"); S.won=false; S.progress=0; S.x=playW/2; S.knockdowns=0; elKD.textContent=0; climber.classList.add("climbing"); },6000);
+}
+
+/* ===== الحلقة ===== */
+let last=0;
+function loop(t){
+  if(!S.started){requestAnimationFrame(loop);return;}
+  const dt=Math.min(0.05,(t-last)/1000||0); last=t;
+  const left=isKey("arrowleft","a"), right=isKey("arrowright","d"), up=isKey("arrowup","w"), down=isKey("arrowdown","s");
+
+  if(!S.falling && !S.won){
+    let mv=0; if(left)mv-=1; if(right)mv+=1;
+    if(mv!==0) S.x=clamp(S.x+mv*moveSpeed*dt,30,playW-30);
+    else if(!S.realMode) S.x=aiDodge(dt);            // مساعد تلقائي في المعاينة فقط
+    let climb=S.climbSpeed; if(up)climb*=2.4; if(down)climb*=0.12;
+    S.progress=clamp(S.progress+climb*dt,0,1);
+    if(S.progress>=1) win();
+  }
+
+  // تحريك العوائق للأسفل + فحص الاصطدام
+  const cy=climberTopY();
+  obstacles.forEach(o=>{
+    o.y+=fallSpeed*dt; o.el.style.top=o.y+"px";
+    if(!o.checked && !S.falling && !S.won && o.y>=cy-14 && o.y<=cy+climberH){
+      if(Math.abs(o.x-S.x)<52){ (o.full?doHit:smallKnock)(o); }
+    }
+  });
+  obstacles=obstacles.filter(o=>{ if(o.y>sceneH+70){o.el.remove();return false;} return true; });
+
+  placeClimber();
+  elProg.style.width=(S.progress*100)+"%";
+  elDist.textContent="للقمة: "+Math.round((1-S.progress)*100)+"%";
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ===== عناصر عائمة ===== */
+function spawnHeart(e){const h=document.createElement("div");h.className="heart";h.textContent=e||pick(["❤️","💖","🔥","✨","👍"]);h.style.left=rnd(0,34)+"px";h.style.setProperty("--dx",rnd(-36,36)+"px");h.style.animationDuration=rnd(2.4,4)+"s";h.style.fontSize=rnd(18,28)+"px";elHeart.appendChild(h);setTimeout(()=>h.remove(),4200);}
+function spawnChat(nick,text){const m=document.createElement("div");m.className="chat-msg";m.innerHTML=`<b>${nick}</b> ${text}`;elChat.appendChild(m);while(elChat.children.length>5)elChat.firstChild.remove();setTimeout(()=>m.remove(),6500);}
+function giftPopup(nick,gift,emoji){const p=document.createElement("div");p.className="gift-pop";p.innerHTML=`<span class="emoji">${emoji}</span>${nick}<br><span style="font-weight:600">أرسل ${gift}</span>`;elGift.appendChild(p);setTimeout(()=>p.remove(),2700);}
+
+/* ===== كونفيتي ===== */
+let parts=[];
+function confetti(){cv.width=innerWidth;cv.height=innerHeight;parts=[];const c=["#22e7ff","#ff2d95","#ffd23f","#7a1bff","#00ff9d","#fff"];for(let i=0;i<180;i++)parts.push({x:cv.width/2,y:cv.height/3,vx:rnd(-8,8),vy:rnd(-13,3),g:rnd(.2,.4),s:rnd(7,13),c:pick(c),rot:rnd(0,6.3),vr:rnd(-.4,.4),life:1});dConf();}
+function dConf(){cx.clearRect(0,0,cv.width,cv.height);let a=false;parts.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life-=.005;if(p.life>0&&p.y<cv.height+20){a=true;cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.globalAlpha=Math.max(0,p.life);cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.5);cx.restore();}});if(a)requestAnimationFrame(dConf);else cx.clearRect(0,0,cv.width,cv.height);}
+
+/* ===== معالجة الأحداث (حقيقية أو محاكاة) ===== */
+function handle(d){
+  switch(d.type){
+    case "ready": if(d.climbSpeed)S.climbSpeed=d.climbSpeed; if(d.rockKnockback)S.rockKnockback=d.rockKnockback; break;
+    case "viewers": S.viewers=d.count||0; elViewers.textContent=S.viewers.toLocaleString("en-US"); break;
+    case "join": if(S.started)spawnChat("🚪",`${d.nickname} انضم`); break;
+    case "comment": if(S.started)spawnChat(d.nickname,d.text); break;
+    case "rock": if(S.started){spawnObstacle("🪨",false,false); spawnHeart("👍");} break;
+    case "fall":
+      if(!S.started)break;
+      S.gifts++; elGifts.textContent=S.gifts;
+      giftPopup(d.nickname,d.giftName||d.vname,d.vehicle);
+      spawnObstacle(d.vehicle,true,true);
+      for(let i=0;i<3;i++)spawnHeart("💎");
+      break;
+    case "streamEnd": elViewers.textContent="انتهى"; break;
+  }
+}
+
+/* ===== الاتصال الحقيقي / المحاكاة ===== */
+let simRunning=false; let simTimers=[];
+function connectOrSim(){
+  if(location.protocol==="file:"){ S.realMode=false; elModeNote.textContent="🤖 وضع معاينة (محاكاة هدايا) — للبث الحقيقي شغّل الأداة على كمبيوتر"; startSim(); return; }
+  const ws=new WebSocket(`${location.protocol==="https:"?"wss":"ws"}://${location.host}`);
+  ws.onopen=()=>{ S.realMode=true; elModeNote.textContent="✅ متصل بـ TikTok — التحكم بالأسهم/WASD للتفادي"; stopSim(); };
+  ws.onmessage=ev=>handle(JSON.parse(ev.data));
+  ws.onclose=()=>{ setTimeout(()=>{ if(!S.realMode)startSim(); connectOrSim(); },3000); };
+  ws.onerror=()=>{};
+  setTimeout(()=>{ if(!S.realMode && !simRunning){ elModeNote.textContent="🤖 وضع معاينة (محاكاة)"; startSim(); } },1500);
+}
+function startSim(){
+  if(simRunning)return; simRunning=true;
+  simTimers.push(setInterval(()=>handle({type:"viewers",count:600+Math.floor(Math.random()*3500)}),1600));
+  (function chatLoop(){ simTimers.push(setTimeout(()=>{handle({type:"comment",nickname:"@"+pick(USERS),text:pick(PHRASES)});chatLoop();},rnd(1200,2600))); })();
+  (function rockLoop(){ simTimers.push(setTimeout(()=>{handle({type:"rock",nickname:"@"+pick(USERS)});rockLoop();},rnd(1500,3000))); })();
+  (function giftLoop(){ simTimers.push(setTimeout(()=>{ const v=pick([["🏍️","دراجة"],["🚗","سيارة"],["🏎️","سيارة رياضية"],["🚚","شاحنة"]]); handle({type:"fall",vehicle:v[0],vname:v[1],giftName:v[1],nickname:"@"+pick(USERS)}); giftLoop(); },rnd(2200,4200))); })();
+}
+function stopSim(){ simRunning=false; simTimers.forEach(t=>clearTimeout(t)); simTimers=[]; }
+
+measure();
+
+</script>
+</body>
+</html>

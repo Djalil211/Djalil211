@@ -1,0 +1,101 @@
+:root{ --neon-c:#22e7ff; --neon-m:#ff2d95; --neon-g:#ffd23f; --text:#fff; --muted:#cdbfe6; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:var(--text)}
+html,body{background:transparent}                                  /* شفافة للبث */
+body.solid{background:radial-gradient(120% 80% at 80% -10%,#1c3a2e 0%,#0a1a14 45%,#04100a 100%)}
+button,input{font-family:inherit}
+
+/* ===== شاشة البداية ===== */
+.start{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:24px;background:rgba(3,12,8,.92);backdrop-filter:blur(6px)}
+.start.hidden{display:none}
+.start-card{width:min(96%,560px);text-align:center;background:linear-gradient(160deg,#103024,#06160f);
+  border:1px solid rgba(255,255,255,.16);border-radius:26px;padding:30px;box-shadow:0 0 60px rgba(34,231,255,.2)}
+.start-card h2{font-size:26px;background:linear-gradient(90deg,var(--neon-g),var(--neon-m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.start-sub{color:var(--muted);font-size:14px;margin:8px 0 18px}
+.name-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);border-radius:14px;
+  padding:13px 16px;color:#fff;font-size:16px;text-align:center;margin-bottom:14px}
+.start-btn{background:linear-gradient(135deg,var(--neon-c),#00a3ff);color:#04121a;padding:15px 30px;border-radius:18px;
+  font-size:18px;font-weight:900;border:none;cursor:pointer;box-shadow:0 0 22px rgba(34,231,255,.55)}
+.start-note{color:var(--muted);font-size:12px;margin-top:14px}
+
+/* ===== اللوحة ===== */
+.stage{position:absolute;inset:18px;display:flex;flex-direction:column;
+  background:linear-gradient(160deg,rgba(8,24,16,.9),rgba(4,14,10,.84));border:1px solid rgba(255,255,255,.18);
+  border-radius:28px;padding:18px;box-shadow:0 18px 55px rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+.live-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.live-badge{display:flex;align-items:center;gap:7px;background:var(--neon-m);color:#fff;font-weight:800;font-size:15px;padding:6px 13px;border-radius:10px;box-shadow:0 0 16px rgba(255,45,149,.6)}
+.live-dot{width:9px;height:9px;border-radius:50%;background:#fff;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.viewers{font-size:15px;font-weight:800;background:rgba(0,0,0,.5);padding:6px 13px;border-radius:10px}
+.brand{font-size:21px;font-weight:900;margin-left:6px;background:linear-gradient(90deg,var(--neon-g),var(--neon-m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.icon-btn{margin-left:auto;width:42px;height:42px;border-radius:50%;font-size:19px;background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.18);cursor:pointer}
+
+/* ===== المشهد ===== */
+.scene{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:18px;
+  background:linear-gradient(180deg,#0d2a1c 0%,#082018 60%,#02100a 100%)}
+.path{position:absolute;left:50%;top:0;bottom:0;width:var(--pw,520px);transform:translateX(-50%);
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.32) 0 3px,transparent 3px 46px,rgba(0,0,0,.32) 46px 50px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 20px,transparent 20px 40px),
+    linear-gradient(#7a4a22,#4f2e12);
+  border:5px solid #2a1808;border-radius:12px;box-shadow:0 0 30px rgba(0,0,0,.5)}
+.summit{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:46px;z-index:7;
+  filter:drop-shadow(0 0 10px var(--neon-g))}
+.abyss{position:absolute;left:0;right:0;bottom:0;height:54px;z-index:4;
+  background:linear-gradient(transparent,#000 75%);border-top:2px dashed rgba(255,255,255,.12)}
+
+/* الرجل السمين */
+.climber{position:absolute;left:0;bottom:0;width:74px;height:96px;z-index:6;will-change:left,bottom,transform;
+  transform:translateX(-50%)}
+.climber .head{width:48px;height:48px;border-radius:50%;background:#f4c08a;margin:0 auto;display:grid;
+  place-items:center;font-size:30px;border:3px solid #d99a5b;box-shadow:inset -3px -3px 0 rgba(0,0,0,.12)}
+.climber .belly{width:70px;height:56px;border-radius:50% 50% 46% 46%;background:linear-gradient(#ff6b6b,#c62828);
+  margin:-10px auto 0;border:3px solid #b71c1c;box-shadow:inset -5px -5px 0 rgba(0,0,0,.14)}
+.climber.climbing{animation:sway 1s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:translateX(-50%) rotate(-4deg)}50%{transform:translateX(-50%) rotate(4deg)}}
+.climber.falling{animation:fall .9s cubic-bezier(.4,0,1,1) forwards}
+@keyframes fall{0%{transform:translateX(-50%) rotate(0)}100%{transform:translateX(-50%) translateY(90vh) rotate(720deg);opacity:0}}
+.climber.hit .head{animation:hurt .4s}
+@keyframes hurt{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* المركّبات الساقطة */
+.vehicle{position:absolute;font-size:50px;z-index:8;will-change:top,transform;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+.vehicle.spin{animation:vspin .6s linear infinite}
+@keyframes vspin{to{transform:rotate(360deg)}}
+
+/* ===== الطبقات العائمة ===== */
+.chat-layer{position:fixed;left:24px;bottom:140px;z-index:30;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:330px;max-width:36%}
+.chat-msg{align-self:flex-start;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;padding:8px 14px;font-size:16px;animation:cin .35s ease,cout .5s ease 6s forwards}
+.chat-msg b{color:var(--neon-c)}
+@keyframes cin{from{opacity:0;transform:translateX(-20px)}to{opacity:1}}
+@keyframes cout{to{opacity:0;transform:translateX(-20px)}}
+.gift-layer{position:fixed;inset:0;z-index:35;pointer-events:none}
+.gift-pop{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%) scale(.2);
+  background:linear-gradient(135deg,var(--neon-m),#7a1bff);color:#fff;padding:16px 26px;border-radius:22px;font-weight:800;
+  text-align:center;box-shadow:0 0 46px rgba(255,45,149,.75);animation:gpop 2.6s ease forwards}
+.gift-pop .emoji{font-size:54px;display:block}
+@keyframes gpop{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}16%{transform:translate(-50%,-50%) scale(1.12);opacity:1}30%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{transform:translate(-50%,-85%);opacity:0}}
+.heart-layer{position:fixed;right:26px;bottom:140px;z-index:25;pointer-events:none;width:74px;height:60%}
+.heart{position:absolute;bottom:0;font-size:24px;animation:fu linear forwards}
+@keyframes fu{0%{transform:translate(0,0) scale(.6);opacity:0}12%{opacity:1}100%{transform:translate(var(--dx,-10px),-60vh) scale(1.1);opacity:0}}
+.confetti{position:fixed;inset:0;z-index:60;pointer-events:none}
+
+/* ===== HUD ===== */
+.hud{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.prog-wrap{position:relative;height:20px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.16);border-radius:12px;overflow:hidden}
+.prog-bar{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--neon-c),var(--neon-g));transition:width .1s linear}
+.prog-label{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000}
+.stats{display:flex;gap:18px;justify-content:center;font-size:14px;color:var(--muted)}
+.stats b{color:var(--neon-g);font-size:17px}
+.dist{color:var(--neon-c)!important}
+.hint{margin-top:6px;text-align:center;color:var(--muted);font-size:14px}
+.keys{display:flex;gap:6px;justify-content:center;margin-top:4px}
+.key{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:4px 9px;font-size:12px;font-weight:700}
+.key.live{background:linear-gradient(135deg,var(--neon-c),#00a3ff);color:#04121a}
+
+.winner{position:fixed;inset:0;z-index:70;display:grid;place-items:center;pointer-events:none}
+.winner.hidden{display:none}
+.winner-flag{font-size:92px;animation:tB 1.2s ease infinite;filter:drop-shadow(0 0 30px rgba(255,210,63,.6))}
+@keyframes tB{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.winner-name{font-size:44px;font-weight:900;background:linear-gradient(90deg,var(--neon-g),var(--neon-c));-webkit-background-clip:text;background-clip:text;color:transparent}
