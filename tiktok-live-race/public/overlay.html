@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=1280, initial-scale=1.0" />
-  <title>سباق الدول — بث TikTok</title>
+  <title>سباق الدول — لوحة بث جاهزة</title>
   <link rel="stylesheet" href="overlay.css" />
 </head>
 <body>
@@ -11,7 +11,8 @@
   <div id="setup" class="setup">
     <div class="setup-card">
       <h2>🏁 اختر الدول المشاركة</h2>
-      <p class="setup-sub">حدّد الدول قبل بدء السباق — يمكنك اختيار أي عدد</p>
+      <p class="setup-sub">جهّز لوحتك قبل بدء البث</p>
+      <input id="streamer-name" class="name-input" placeholder="✍️ اسمك / اسم حسابك في البث (اختياري)" />
       <div class="quick">
         <button class="qbtn" data-q="all">تحديد الكل</button>
         <button class="qbtn" data-q="none">مسح الكل</button>
@@ -23,32 +24,33 @@
       <div id="chips" class="chips"></div>
       <div class="setup-foot">
         <span class="sel-count">المحدّد: <b id="sel-count">0</b> دولة</span>
-        <button id="start-race" class="start-btn" disabled>ابدأ السباق 🏁</button>
+        <button id="start-race" class="start-btn" disabled>ابدأ البث 🏁</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== واجهة البث ===== -->
-  <header class="live-bar">
-    <div class="live-badge"><span class="live-dot"></span> مباشر</div>
-    <div class="viewers"><span id="viewer-count">0</span> 👁</div>
-    <div class="brand">🏁 سباق الدول العربية</div>
-    <button id="change" class="icon-btn" title="تغيير الدول">⚙️</button>
-    <button id="reset" class="icon-btn" title="سباق جديد">🔄</button>
-  </header>
-
+  <!-- ===== الطبقات العائمة (شفافة فوق البث) ===== -->
   <div id="chat-layer" class="chat-layer"></div>
   <div id="gift-layer" class="gift-layer"></div>
   <div id="heart-layer" class="heart-layer"></div>
   <canvas id="confetti" class="confetti"></canvas>
 
-  <main class="game">
+  <!-- ===== لوحة السباق العائمة (Broadcast) ===== -->
+  <div class="stage">
+    <header class="live-bar">
+      <div class="live-badge"><span class="live-dot"></span> مباشر</div>
+      <div class="viewers"><span id="viewer-count">0</span> 👁</div>
+      <div class="brand" id="brand-name">🏁 سباق الدول</div>
+      <button id="bg-toggle" class="icon-btn" title="تبديل الخلفية">🖼️</button>
+      <button id="change" class="icon-btn" title="تغيير الدول">⚙️</button>
+      <button id="reset" class="icon-btn" title="سباق جديد">🔄</button>
+    </header>
     <div class="track-wrap">
       <div id="lanes" class="lanes"></div>
       <div class="finish-line"><div class="finish-flag">🏁</div></div>
     </div>
-    <div class="hint" id="hint">💡 اكتب اسم دولتك في التعليقات • اللايك يزيد الحماس • الهدايا تعطي دفعة كبيرة!</div>
-  </main>
+    <div class="hint">💡 اكتب اسم دولتك في التعليقات • اللايك يزيد الحماس • الهدايا تعطي دفعة كبيرة!</div>
+  </div>
 
   <div id="winner" class="winner hidden">
     <div class="winner-flag" id="winner-flag">🏆</div>

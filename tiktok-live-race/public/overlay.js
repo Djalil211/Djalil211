@@ -23,6 +23,12 @@ let COUNTRIES = [];
 const state = { lanes: [], raceOver: false, last: 0, racing: false };
 let selected = new Set();        // أكواد الدول المختارة
 
+// إعدادات البث من رابط URL (مثال: ?name=اسمك&solid=1)
+const params = new URLSearchParams(location.search);
+const nameInput = document.getElementById("streamer-name");
+if(params.get("name")) nameInput.value = params.get("name");
+if(params.get("solid") === "1") document.body.classList.add("solid");
+
 const rnd = (a,b)=>a+Math.random()*(b-a);
 const pick = a=>a[Math.floor(Math.random()*a.length)];
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
@@ -104,7 +110,7 @@ function buildLanes(){
   });
   measure();
 }
-function measure(){ state.lanes.forEach(l=>{ l.maxX = Math.max(60, l.lane.clientWidth - 110); }); }
+function measure(){ state.lanes.forEach(l=>{ l.maxX = Math.max(60, l.lane.clientWidth - 136); }); }
 
 /* ---------- الدفع ---------- */
 function boostByCode(code, amount){ const l=state.lanes.find(x=>x.c.code===code); if(l) applyBoost(l,amount); }
@@ -199,6 +205,8 @@ function drawConfetti(){
 /* ---------- بدء / إعادة / تغيير ---------- */
 function startRace(){
   if(selected.size < 2) return;
+  const nm = (nameInput.value || params.get("name") || "").trim();
+  document.getElementById("brand-name").textContent = nm ? ("🏁 " + nm) : "🏁 سباق الدول";
   elSetup.classList.add("hidden");
   state.raceOver=false; state.racing=true;
   cx.clearRect(0,0,cv.width,cv.height);
@@ -217,6 +225,9 @@ document.getElementById("change").addEventListener("click", ()=>{
   elWinner.classList.add("hidden");
   elLanes.innerHTML="";
   elSetup.classList.remove("hidden");
+});
+document.getElementById("bg-toggle").addEventListener("click", ()=>{
+  document.body.classList.toggle("solid");
 });
 
 /* ---------- WebSocket (أحداث TikTok الحقيقية) ---------- */
