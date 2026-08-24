@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, initial-scale=1.0" />
+  <title>رجل الطريق الخشبي 3D — بث TikTok</title>
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div id="start" class="start">
+    <div class="start-card">
+      <h2>🧗🪵 رجل الطريق الخشبي — ثلاثي الأبعاد</h2>
+      <p class="start-sub">تجنّب المركّبات الساقطة بالكيبورد • الهدايا تُسقطه • بدون هدايا يصل للقمة 🏆</p>
+      <input id="streamer-name" class="name-input" placeholder="✍️ اسمك في البث (اختياري)" />
+      <button id="begin" class="start-btn">ابدأ 🎬</button>
+      <p class="start-note" id="mode-note">⏳ تحميل المشهد ثلاثي الأبعاد…</p>
+    </div>
+  </div>
+
+  <div id="chat-layer" class="chat-layer"></div>
+  <div id="gift-layer" class="gift-layer"></div>
+  <div id="heart-layer" class="heart-layer"></div>
+  <canvas id="confetti" class="confetti"></canvas>
+
+  <div class="stage">
+    <header class="live-bar">
+      <div class="live-badge"><span class="live-dot"></span> مباشر</div>
+      <div class="viewers"><span id="viewer-count">0</span> 👁</div>
+      <div class="brand" id="brand-name">🧗 رجل الطريق الخشبي 3D</div>
+      <button id="bg-toggle" class="icon-btn" title="تبديل الخلفية">🖼️</button>
+      <button id="reset" class="icon-btn" title="إعادة">🔄</button>
+    </header>
+    <div id="scene" class="scene"></div>
+    <div class="hud">
+      <div class="prog-wrap"><div class="prog-bar" id="prog"></div><span class="prog-label">التقدّم للقمة</span></div>
+      <div class="stats">
+        <span>طرح: <b id="knockdowns">0</b></span>
+        <span>هدايا: <b id="gifts">0</b></span>
+        <span class="dist" id="dist">للقمة: 100%</span>
+      </div>
+    </div>
+    <div class="hint">⌨️ الأسهم أو WASD للتحرك والتفادي • 🎁 الهدايا تُسقط المركّبات عليه</div>
+  </div>
+
+  <div id="winner" class="winner hidden">
+    <div class="winner-flag">🏆</div>
+    <div class="winner-name">وصل للقمة! فاز!</div>
+  </div>
+
+  <script type="module" src="overlay.js"></script>
+</body>
+</html>
