@@ -1,0 +1,15 @@
+{
+  "tiktokUsername": "اكتب_اسمك_هنا_بدون_@",
+  "signApiKey": "ضع_هنا_مفتاح_التوقيع_من_eulerstream",
+  "port": 3000,
+  "commentBoost": 0.06,
+  "likeBoost": 0.010,
+  "giftBoostBase": 0.10,
+  "giftBoostPerDiamond": 0.025,
+  "giftMap": {
+    "_شرح": "اختياري: المفتاح = اسم الهدية بالإنجليزية كما في TikTok، القيمة = كود الدولة",
+    "Rose": "DZ",
+    "Lion": "MA",
+    "TikTok Universe": "EG"
+  }
+}

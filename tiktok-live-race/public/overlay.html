@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1280, initial-scale=1.0" />
+  <title>سباق الدول — بث TikTok</title>
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <header class="live-bar">
+    <div class="live-badge"><span class="live-dot"></span> مباشر</div>
+    <div class="viewers"><span id="viewer-count">0</span> 👁</div>
+    <div class="brand">🏁 سباق الدول العربية</div>
+    <button id="reset" class="icon-btn" title="سباق جديد">🔄</button>
+  </header>
+
+  <div id="chat-layer" class="chat-layer"></div>
+  <div id="gift-layer" class="gift-layer"></div>
+  <div id="heart-layer" class="heart-layer"></div>
+  <canvas id="confetti" class="confetti"></canvas>
+
+  <main class="game">
+    <div class="track-wrap">
+      <div id="lanes" class="lanes"></div>
+      <div class="finish-line"><div class="finish-flag">🏁</div></div>
+    </div>
+    <div class="hint" id="hint">💡 شجّع دولتك: اكتب اسمها في التعليقات • اللايك يزيد الحماس • الهدايا تعطي دفعة كبيرة!</div>
+  </main>
+
+  <div id="winner" class="winner hidden">
+    <div class="winner-flag" id="winner-flag">🏆</div>
+    <div class="winner-name" id="winner-name">—</div>
+  </div>
+
+  <script src="overlay.js"></script>
+</body>
+</html>

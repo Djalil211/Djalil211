@@ -1,0 +1,22 @@
+{
+  "name": "tiktok-live-countries-race",
+  "version": "1.0.0",
+  "description": "سباق الدول العربية — لعبة بث TikTok تفاعلية تستجيب للهدايا واللايكات والتعليقات الحقيقية من مشاهديك",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "tiktok",
+    "live",
+    "race",
+    "interactive",
+    "game"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1",
+    "tiktok-live-connector": "^2.4.4",
+    "ws": "^8.21.3"
+  }
+}
