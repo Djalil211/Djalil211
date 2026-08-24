@@ -106,7 +106,7 @@ button,input{font-family:inherit}
 
   <script type="module">
 /* ====================================================================
-   رجل الطريق الخشبي — ثلاثي الأبعاد (Three.js) + بث TikTok + تحكم كيبورد
+   رجل الطريق الخشبي — ثلاثي الأبعاد (Three.js) + شخصية حيوية + بث TikTok
    ==================================================================== */
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.min.js';
 
@@ -122,8 +122,7 @@ const PHRASES=["اسقطوه! 😂","طرحوه!","شاحنة عليه 🚚","go
 /* ===== الحالة ===== */
 const S={ progress:0, x:0, falling:false, fallTimer:0, won:false, knockdowns:0, gifts:0,
   climbSpeed:0.020, rockKnockback:0.06, started:false, realMode:false };
-const STEPS=28, STEP_H=2.4, STEP_D=2.8, HW=9, totalH=STEPS*STEP_H, totalD=STEPS*STEP_D;
-const MOVE=15, FALL=22;
+const HW=8, totalH=46, MOVE=12, FALL=20;
 let obstacles=[], time=0, clock, trophy, trophyRing;
 
 /* ===== Three.js ===== */
@@ -135,55 +134,102 @@ function initThree(){
   renderer.setClearColor(0x000000,0);
   sceneEl.appendChild(renderer.domElement);
   scene=new THREE.Scene();
-  camera=new THREE.PerspectiveCamera(52, sceneEl.clientWidth/sceneEl.clientHeight, 0.1, 600);
-  camera.position.set(8,8,22);
-  scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x402a18, 1.0));
-  const sun=new THREE.DirectionalLight(0xffffff, 1.1); sun.position.set(10,30,20); scene.add(sun);
-  buildStairs(); climber=makeClimber(); scene.add(climber);
+  camera=new THREE.PerspectiveCamera(54, sceneEl.clientWidth/sceneEl.clientHeight, 0.1, 400);
+  scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x3a2a18, 1.05));
+  const sun=new THREE.DirectionalLight(0xfff4e0, 1.15); sun.position.set(6,24,16); scene.add(sun);
+  const fill=new THREE.DirectionalLight(0x88bbff, 0.4); fill.position.set(-10,8,6); scene.add(fill);
+  buildScene(); climber=makeClimber(); scene.add(climber);
   clock=new THREE.Clock();
   window.addEventListener("resize",onResize);
 }
-function onResize(){
-  const w=sceneEl.clientWidth, h=sceneEl.clientHeight;
-  renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix();
-}
-function buildStairs(){
+function onResize(){ const w=sceneEl.clientWidth,h=sceneEl.clientHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+
+function buildScene(){
   const wood=new THREE.MeshLambertMaterial({color:0x8a5a2b});
   const dark=new THREE.MeshLambertMaterial({color:0x6b421f});
-  for(let i=0;i<STEPS;i++){
-    const step=new THREE.Mesh(new THREE.BoxGeometry(HW*2, STEP_H, STEP_D), i%2?dark:wood);
-    step.position.set(0, i*STEP_H+STEP_H/2, -i*STEP_D); scene.add(step);
-  }
   const rail=new THREE.MeshLambertMaterial({color:0x4a2c12});
-  for(const sx of [-HW,HW]){
-    const r=new THREE.Mesh(new THREE.BoxGeometry(0.5,totalH,totalD+2),rail);
-    r.position.set(sx,totalH/2,-totalD/2); scene.add(r);
+  // الجدار الخشبي العمودي (الطريق)
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(HW*2+1, totalH+4, 0.8), dark);
+  wall.position.set(0, totalH/2, -2.6); scene.add(wall);
+  // ألواح أفقية
+  for(let i=0;i<22;i++){
+    const p=new THREE.Mesh(new THREE.BoxGeometry(HW*2+0.6, 1.4, 0.9), i%2?dark:wood);
+    p.position.set(0, i*2.3+1, -2.2); scene.add(p);
   }
-  const base=new THREE.Mesh(new THREE.CylinderGeometry(HW+1,HW+2,1.2,24),wood);
-  base.position.set(0,-0.6,0); scene.add(base);
-  trophy=new THREE.Mesh(new THREE.SphereGeometry(2.4,22,16),new THREE.MeshLambertMaterial({color:0xffd23f,emissive:0x553300}));
-  trophy.position.set(0,totalH+3,-totalD); scene.add(trophy);
-  trophyRing=new THREE.Mesh(new THREE.TorusGeometry(3.2,0.25,10,30),new THREE.MeshLambertMaterial({color:0xffd23f,emissive:0x332200}));
-  trophyRing.position.set(0,totalH+3,-totalD); trophyRing.rotation.x=Math.PI/2; scene.add(trophyRing);
+  // القضبان الجانبية
+  for(const sx of [-HW,HW]){
+    const r=new THREE.Mesh(new THREE.BoxGeometry(0.5,totalH+3,0.9),rail);
+    r.position.set(sx,totalH/2,-2.2); scene.add(r);
+  }
+  // قاعدة
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(HW+1.5,HW+2.5,1.4,28),wood);
+  base.position.set(0,-0.7,0); scene.add(base);
+  // الكأس
+  trophy=new THREE.Mesh(new THREE.SphereGeometry(2.2,22,16),new THREE.MeshLambertMaterial({color:0xffd23f,emissive:0x553300}));
+  trophy.position.set(0,totalH+2.5,0); scene.add(trophy);
+  trophyRing=new THREE.Mesh(new THREE.TorusGeometry(3,0.22,10,30),new THREE.MeshLambertMaterial({color:0xffd23f,emissive:0x332200}));
+  trophyRing.position.set(0,totalH+2.5,0); trophyRing.rotation.x=Math.PI/2; scene.add(trophyRing);
 }
+
+/* ===== الشخصية (رجل سمين مضحك، وجه أمامي، مفاصل للحركة) ===== */
 function makeClimber(){
   const g=new THREE.Group();
-  const skin=new THREE.MeshLambertMaterial({color:0xf4c08a});
+  const skin=new THREE.MeshLambertMaterial({color:0xf6c79b});
   const shirt=new THREE.MeshLambertMaterial({color:0xe74c3c});
-  const dark=new THREE.MeshLambertMaterial({color:0x222222});
-  const body=new THREE.Mesh(new THREE.SphereGeometry(1.05,22,16),shirt); body.scale.set(1.15,1.05,1.0); body.position.y=1.05; g.add(body);
-  const head=new THREE.Mesh(new THREE.SphereGeometry(0.56,18,14),skin); head.position.y=2.35; g.add(head);
-  const eg=new THREE.SphereGeometry(0.08,8,8);
-  const le=new THREE.Mesh(eg,dark); le.position.set(-0.18,2.42,0.5); g.add(le);
-  const re=new THREE.Mesh(eg,dark); re.position.set(0.18,2.42,0.5); g.add(re);
-  const ag=new THREE.CapsuleGeometry(0.16,0.7,4,8);
-  const la=new THREE.Mesh(ag,skin); la.position.set(-1.1,1.25,0.3); la.rotation.z=0.5; g.add(la);
-  const ra=new THREE.Mesh(ag,skin); ra.position.set(1.1,1.25,0.3); ra.rotation.z=-0.5; g.add(ra);
-  const lg=new THREE.CapsuleGeometry(0.18,0.55,4,8);
-  const ll=new THREE.Mesh(lg,dark); ll.position.set(-0.35,0.25,0.1); g.add(ll);
-  const rl=new THREE.Mesh(lg,dark); rl.position.set(0.35,0.25,0.1); g.add(rl);
-  g.userData={la,ra,ll,rl}; g.scale.set(1.1,1.1,1.1); return g;
+  const pants=new THREE.MeshLambertMaterial({color:0x2c3e60});
+  const shoe=new THREE.MeshLambertMaterial({color:0x222222});
+  const hair=new THREE.MeshLambertMaterial({color:0x3a2417});
+  const white=new THREE.MeshLambertMaterial({color:0xffffff});
+  const dark=new THREE.MeshLambertMaterial({color:0x1a1a1a});
+  const sph=(r,w,h)=>new THREE.SphereGeometry(r,w||16,h||14);
+  const cap=(r,h,w)=>new THREE.CapsuleGeometry(r,h,6,12);
+
+  const torso=new THREE.Group(); torso.position.y=1.55; g.add(torso);
+  const body=new THREE.Mesh(sph(0.95,20,16),shirt); body.scale.set(1.25,1.0,1.0); torso.add(body);
+  const belly=new THREE.Mesh(sph(0.6,18,14),shirt); belly.scale.set(1.3,1.1,1.1); belly.position.set(0,-0.1,0.55); torso.add(belly); // كرش بارز
+  const belt=new THREE.Mesh(new THREE.BoxGeometry(2.0,0.28,1.4),dark); belt.position.set(0,-0.85,0.2); torso.add(belt);
+
+  const head=new THREE.Group(); head.position.set(0,1.15,0.05); torso.add(head);
+  const headMesh=new THREE.Mesh(sph(0.62,20,16),skin); head.add(headMesh);
+  const hairTop=new THREE.Mesh(sph(0.64,20,16,0,Math.PI*2,0,Math.PI*0.62),hair); head.add(hairTop);
+  // وجه (باتجاه الكاميرا +Z)
+  const eyeG=sph(0.1,10,8);
+  const le=new THREE.Mesh(eyeG,white); le.position.set(-0.22,0.05,0.55); head.add(le);
+  const re=new THREE.Mesh(eyeG,white); re.position.set(0.22,0.05,0.55); head.add(re);
+  const pupG=sph(0.05,8,8);
+  const lp=new THREE.Mesh(pupG,dark); lp.position.set(-0.22,0.05,0.62); head.add(lp);
+  const rp=new THREE.Mesh(pupG,dark); rp.position.set(0.22,0.05,0.62); head.add(rp);
+  const browG=new THREE.BoxGeometry(0.22,0.06,0.05);
+  const lb=new THREE.Mesh(browG,hair); lb.position.set(-0.22,0.22,0.6); lb.rotation.z=0.2; head.add(lb);
+  const rb=new THREE.Mesh(browG,hair); rb.position.set(0.22,0.22,0.6); rb.rotation.z=-0.2; head.add(rb);
+  const mouth=new THREE.Mesh(new THREE.TorusGeometry(0.16,0.05,8,16,Math.PI),dark); mouth.position.set(0,-0.2,0.58); mouth.rotation.z=Math.PI; head.add(mouth);
+  const cheekG=sph(0.12,10,8);
+  const lc=new THREE.Mesh(cheekG,new THREE.MeshLambertMaterial({color:0xff9a8b})); lc.position.set(-0.36,-0.1,0.5); lc.scale.set(1,0.8,0.5); head.add(lc);
+  const rc=new THREE.Mesh(cheekG,new THREE.MeshLambertMaterial({color:0xff9a8b})); rc.position.set(0.36,-0.1,0.5); rc.scale.set(1,0.8,0.5); head.add(rc);
+
+  // أذرع (تتحرك من الكتف)
+  function makeArm(sx){
+    const a=new THREE.Group(); a.position.set(sx*1.05,0.75,0); 
+    const up=new THREE.Mesh(cap(0.2,0.5),shirt); up.position.y=-0.3; a.add(up);
+    const hand=new THREE.Mesh(sph(0.2,12,10),skin); hand.position.y=-0.7; a.add(hand);
+    return a;
+  }
+  const armL=makeArm(-1), armR=makeArm(1); torso.add(armL); torso.add(armR);
+  // أرجل (تتحرك من الورك)
+  function makeLeg(sx){
+    const l=new THREE.Group(); l.position.set(sx*0.42,-1.0,0);
+    const thigh=new THREE.Mesh(cap(0.24,0.6),pants); thigh.position.y=-0.4; l.add(thigh);
+    const foot=new THREE.Mesh(new THREE.BoxGeometry(0.4,0.22,0.6),shoe); foot.position.set(0,-0.85,0.12); l.add(foot);
+    return l;
+  }
+  const legL=makeLeg(-1), legR=makeLeg(1); torso.add(legL); torso.add(legR);
+
+  g.userData={torso,head,armL,armR,legL,legR,mouth,lb,rb};
+  g.scale.setScalar(1.05);
+  return g;
 }
+
+/* ===== المركّبات ===== */
 function makeVehicle(type){
   const g=new THREE.Group();
   const col={car:0x2980b9,sports:0xe74c3c,truck:0x27ae60,motor:0x16a085}[type]||0x34495e;
@@ -202,22 +248,20 @@ function makeVehicle(type){
 
 /* ===== العوائق ===== */
 function spawnObstacle(vtype,full,aimed){
-  const cy=S.progress*totalH, cz=-S.progress*totalD;
+  const cy=S.progress*totalH;
   const g=makeVehicle(vtype);
-  const x = (aimed && Math.random()<0.5) ? clamp(S.x+rnd(-1.5,1.5),-8,8) : rnd(-8,8);
-  const z = cz + rnd(-1.5,1.5);
-  g.position.set(x, cy+28, z); g.rotation.set(rnd(0,3),rnd(0,3),rnd(0,3));
+  const x=(aimed && Math.random()<0.5)?clamp(S.x+rnd(-1.5,1.5),-HW+1,HW-1):rnd(-HW+1,HW-1);
+  g.position.set(x,cy+26,0); g.rotation.set(rnd(0,3),rnd(0,3),rnd(0,3));
   scene.add(g);
-  obstacles.push({g,x,y:cy+28,z,full,checked:false});
+  obstacles.push({g,x,y:cy+26,full,checked:false});
 }
 function doHit(o){ if(o)scene.remove(o.g); S.knockdowns++; elKD.textContent=S.knockdowns; S.falling=true; S.fallTimer=0; shake(); }
 function smallKnock(o){ if(o)scene.remove(o.g); S.progress=Math.max(0,S.progress-S.rockKnockback); shake(true); }
 function shake(small){const st=document.querySelector(".stage");st.classList.remove("shake","shake-s");void st.offsetWidth;st.classList.add(small?"shake-s":"shake");}
 const ss=document.createElement("style"); ss.textContent=".stage.shake{animation:shk .4s}.stage.shake-s{animation:shk .2s}@keyframes shk{0%,100%{transform:translate(0,0)}25%{transform:translate(-6px,3px)}50%{transform:translate(5px,-3px)}75%{transform:translate(-3px,2px)}}"; document.head.appendChild(ss);
-
 function win(){ S.won=true; elWinner.classList.remove("hidden"); confetti(); setTimeout(()=>{elWinner.classList.add("hidden");S.won=false;S.progress=0;S.x=0;S.knockdowns=0;elKD.textContent=0;},6000); }
 
-/* ===== مدخلات الكيبورد ===== */
+/* ===== الكيبورد ===== */
 const keys={};
 const CTRL=["arrowleft","arrowright","arrowup","arrowdown","a","d","w","s"," "];
 window.addEventListener("keydown",e=>{const k=e.key.toLowerCase(); if(CTRL.includes(k)){e.preventDefault();keys[k]=true;}});
@@ -227,44 +271,72 @@ const isKey=(...a)=>a.some(k=>keys[k]);
 function aiDodge(dt){
   const cy=S.progress*totalH; let threat=null,best=Infinity;
   for(const o of obstacles){ if(!o.checked && o.y>cy && o.y<cy+24){const d=Math.abs(o.x-S.x); if(d<best){best=d;threat=o;}} }
-  const target=(threat && Math.abs(threat.x-S.x)<4)?(threat.x<S.x?8:-8):0;
-  const dir=Math.sign(target-S.x)||0;
-  return clamp(S.x+dir*MOVE*0.7*dt,-8,8);
+  const target=(threat && Math.abs(threat.x-S.x)<4)?(threat.x<S.x?HW-1:-HW+1):0;
+  return clamp(S.x+ (Math.sign(target-S.x)||0)*MOVE*0.7*dt,-HW+1,HW-1);
+}
+function dangerNear(){ const cy=S.progress*totalH; return obstacles.some(o=>!o.checked && o.y>cy && o.y<cy+8 && Math.abs(o.x-S.x)<3.5); }
+
+/* ===== تحريك الشخصية (مشي/تسلّق + رعب) ===== */
+function animateClimber(dt,cy){
+  const u=climber.userData;
+  const panic = dangerNear();
+  const sp = panic?15:7.5;
+  const s=Math.sin(time*sp), c=Math.cos(time*sp);
+  const amp = panic?1.25:1.0;
+  // أذرع تتأرجح للأمام/الخلف (+تلويح عند الرعب)
+  u.armL.rotation.x = s*0.9*amp;
+  u.armR.rotation.x = -s*0.9*amp;
+  if(panic){ u.armL.rotation.z = -0.6 + Math.sin(time*22)*0.4; u.armR.rotation.z = 0.6 - Math.sin(time*22)*0.4; }
+  else { u.armL.rotation.z = 0.15; u.armR.rotation.z = -0.15; }
+  // أرجل تتناوب (رفع الركبة)
+  u.legL.rotation.x = -Math.max(0,s)*0.9*amp + Math.min(0,s)*0.3;
+  u.legR.rotation.x = -Math.max(0,-s)*0.9*amp + Math.min(0,-s)*0.3;
+  // جذع ينبض + ميل صعود
+  const bob = Math.abs(c)*0.18;
+  u.torso.position.y = 1.55 + bob;
+  u.torso.rotation.x = 0.12;
+  // رأس يهتز (رعب = اهتزاز أقوى)
+  u.head.rotation.x = Math.sin(time*sp)*0.12 + (panic?Math.sin(time*30)*0.08:0);
+  u.head.rotation.z = panic?Math.sin(time*25)*0.1:0;
+  // فم مفتوح عند الرعب (تكبير)
+  u.mouth.scale.setScalar(panic?1.6:1.0);
+  // وضع الشخصية (الموقع + ميل خفيف للجسم كله)
+  climber.position.set(S.x, cy + bob*0.5, 0);
+  climber.rotation.y = Math.sin(time*2)*0.05;
 }
 
 /* ===== الحلقة ===== */
 function animate(){
   requestAnimationFrame(animate);
   const dt=Math.min(0.05, clock?clock.getDelta():0.016); time+=dt;
-  const cy=S.progress*totalH, cz=-S.progress*totalD;
+  const cy=S.progress*totalH;
   if(S.started && !S.falling && !S.won){
     const left=isKey("arrowleft","a"), right=isKey("arrowright","d"), up=isKey("arrowup","w"), down=isKey("arrowdown","s");
     let mv=0; if(left)mv-=1; if(right)mv+=1;
-    if(mv!==0) S.x=clamp(S.x+mv*MOVE*dt,-8,8);
+    if(mv!==0) S.x=clamp(S.x+mv*MOVE*dt,-HW+1,HW-1);
     else if(!S.realMode) S.x=aiDodge(dt);
     let climb=S.climbSpeed; if(up)climb*=2.4; if(down)climb*=0.12;
     S.progress=clamp(S.progress+climb*dt,0,1);
     if(S.progress>=1) win();
   }
-  // الرجل
   if(S.falling){
-    S.fallTimer+=dt; climber.position.y-=dt*48; climber.rotation.z+=dt*10;
+    S.fallTimer+=dt; climber.position.y-=dt*42; climber.rotation.z+=dt*9; climber.rotation.x+=dt*5;
     if(S.fallTimer>=0.9){ S.falling=false; S.progress=0; S.x=0; climber.rotation.set(0,0,0); }
+  } else if(S.started){
+    animateClimber(dt,cy);
   } else {
-    climber.position.set(S.x, cy+Math.sin(time*9)*0.13, cz);
-    if(!S.won){const u=climber.userData,s=Math.sin(time*8); u.la.rotation.x=s*0.7; u.ra.rotation.x=-s*0.7; u.ll.rotation.x=-s*0.5; u.rl.rotation.x=s*0.5;}
+    climber.position.set(S.x,cy,0);
   }
-  // العوائق
+  // العوائق تسقط
   for(const o of obstacles){
-    o.y-=FALL*dt; o.g.position.set(o.x,o.y,o.z); o.g.rotation.x+=dt*2.2; o.g.rotation.z+=dt*1.7;
-    if(!o.checked && !S.falling && !S.won && o.y<=cy+2.2 && o.y>=cy-1 && Math.abs(o.x-S.x)<3 && Math.abs(o.z-cz)<3){ o.checked=true; (o.full?doHit:smallKnock)(o); }
+    o.y-=FALL*dt; o.g.position.set(o.x,o.y,0); o.g.rotation.x+=dt*2.2; o.g.rotation.z+=dt*1.7;
+    if(!o.checked && !S.falling && !S.won && o.y<=cy+2.0 && o.y>=cy-1 && Math.abs(o.x-S.x)<3){ o.checked=true; (o.full?doHit:smallKnock)(o); }
   }
-  obstacles=obstacles.filter(o=>{ if(o.y<cy-16){scene.remove(o.g);return false;} return true; });
-  // كاميرا متتبعة
-  const cp=new THREE.Vector3(S.x*0.2+8, cy+6, cz+20);
-  camera.position.lerp(cp,0.06);
-  camera.lookAt(S.x*0.35, cy+2, cz);
-  // trophy spin
+  obstacles=obstacles.filter(o=>{ if(o.y<cy-15){scene.remove(o.g);return false;} return true; });
+  // كاميرا أمامية متتبعة
+  const cp=new THREE.Vector3(S.x*0.12, cy+3.4, 15);
+  camera.position.lerp(cp,0.05);
+  camera.lookAt(S.x*0.18, cy+0.6, 0);
   if(trophy)trophy.rotation.y+=dt*0.8;
   if(trophyRing)trophyRing.rotation.z+=dt;
   elProg.style.width=(S.progress*100)+"%"; elDist.textContent="للقمة: "+Math.round((1-S.progress)*100)+"%";
