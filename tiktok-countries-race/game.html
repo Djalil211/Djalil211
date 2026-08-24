@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0118" />
+  <meta name="description" content="سباق الدول العربية — لعبة تفاعلية بأسلوب البث المباشر" />
+  <title>سباق الدول — بث مباشر</title>
+  <style>
+:root{
+  --bg0:#0b0118; --bg1:#170432; --bg2:#250a4d;
+  --neon-c:#22e7ff; --neon-m:#ff2d95; --neon-g:#ffd23f;
+  --text:#f5f0ff; --muted:#b9a9d6;
+  --card:rgba(255,255,255,.06); --card-brd:rgba(255,255,255,.12);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden}
+body{
+  font-family:"Segoe UI",Tahoma,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text);
+  background:radial-gradient(120% 80% at 80% -10%,var(--bg2) 0%,var(--bg1) 45%,var(--bg0) 100%);
+  user-select:none;-webkit-user-select:none;
+  position:fixed;inset:0;
+}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+
+/* ===== شريط البث ===== */
+.live-bar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;gap:10px;
+  padding:max(10px,env(safe-area-inset-top)) 14px 8px;
+}
+.live-badge{
+  display:flex;align-items:center;gap:6px;
+  background:var(--neon-m);color:#fff;font-weight:800;font-size:13px;
+  padding:5px 10px;border-radius:8px;box-shadow:0 0 14px rgba(255,45,149,.6);
+}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.viewers{font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,.4);
+  padding:5px 10px;border-radius:8px;backdrop-filter:blur(6px)}
+.top-actions{margin-left:auto;display:flex;gap:8px}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;font-size:17px;
+  background:rgba(0,0,0,.4);color:#fff;backdrop-filter:blur(6px);
+  display:grid;place-items:center;border:1px solid var(--card-brd);
+}
+
+/* ===== الطبقات العائمة ===== */
+.chat-layer{position:fixed;top:54px;bottom:120px;left:8px;z-index:30;
+  display:flex;flex-direction:column;justify-content:flex-end;gap:6px;
+  pointer-events:none;width:62%}
+.chat-msg{
+  align-self:flex-start;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
+  border:1px solid var(--card-brd);border-radius:14px;padding:6px 10px;
+  font-size:13px;line-height:1.3;max-width:100%;
+  animation:chatIn .4s ease, chatOut .5s ease 5.2s forwards;
+}
+.chat-msg b{color:var(--neon-c)}
+@keyframes chatIn{from{opacity:0;transform:translateX(-18px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes chatOut{to{opacity:0;transform:translateX(-18px) scale(.9)}}
+.gift-layer{position:fixed;inset:0;z-index:35;pointer-events:none;display:grid;place-items:center}
+.gift-pop{
+  position:absolute;top:38%;left:50%;transform:translate(-50%,-50%) scale(.3);
+  background:linear-gradient(135deg,var(--neon-m),#7a1bff);color:#fff;
+  padding:12px 18px;border-radius:18px;font-weight:800;font-size:15px;
+  box-shadow:0 0 30px rgba(255,45,149,.7);text-align:center;
+  animation:giftPop 2.4s ease forwards;white-space:nowrap;
+}
+.gift-pop .emoji{font-size:30px;display:block}
+@keyframes giftPop{
+  0%{transform:translate(-50%,-50%) scale(.2) rotate(-8deg);opacity:0}
+  18%{transform:translate(-50%,-50%) scale(1.1) rotate(3deg);opacity:1}
+  30%{transform:translate(-50%,-50%) scale(1) rotate(0)}
+  80%{opacity:1}
+  100%{transform:translate(-50%,-90%) scale(1);opacity:0}
+}
+.heart-layer{position:fixed;right:14px;bottom:120px;z-index:25;pointer-events:none;
+  width:60px;height:60%}
+.heart{position:absolute;bottom:0;font-size:22px;animation:floatUp linear forwards}
+@keyframes floatUp{
+  0%{transform:translate(0,0) scale(.6) rotate(0);opacity:0}
+  10%{opacity:1}
+  100%{transform:translate(var(--drift,-10px),-60vh) scale(1.1) rotate(40deg);opacity:0}
+}
+.confetti{position:fixed;inset:0;z-index:60;pointer-events:none}
+
+/* ===== اللعبة ===== */
+.game{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:54px 12px 16px}
+.title-row{text-align:center;margin:4px 0 8px}
+.title-row h1{margin:0;font-size:20px;font-weight:900;
+  background:linear-gradient(90deg,var(--neon-c),var(--neon-m));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+
+.track-wrap{position:relative;flex:1;display:flex;flex-direction:column;
+  gap:8px;margin:6px 0;padding:10px 8px;
+  background:var(--card);border:1px solid var(--card-brd);border-radius:18px;
+  overflow:hidden}
+.lanes{flex:1;display:flex;flex-direction:column;gap:8px}
+
+/* خط النهاية على اليمين (RTL: البداية يمين؟ نجعل المسار LTR حركياً عبر transform) */
+.finish-line{position:absolute;top:0;bottom:0;right:8px;width:26px;z-index:6;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(45deg,#fff0 0 6px,rgba(255,255,255,.10) 6px 12px);
+  border-left:2px dashed rgba(255,255,255,.35)}
+.finish-flag{font-size:20px;filter:drop-shadow(0 0 6px var(--neon-g))}
+.finish-tape{writing-mode:vertical-rl;font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:1px}
+
+.lane{position:relative;flex:1;min-height:46px;border-radius:14px;overflow:hidden;
+  background:linear-gradient(90deg,var(--lane-c1,#333) 0%,var(--lane-c2,#222) 100%);
+  border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 0 18px rgba(0,0,0,.4)}
+.lane-track{
+  position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.10) 1.4px,transparent 1.6px);
+  background-size:18px 18px;opacity:.5;
+}
+.racer{
+  position:absolute;top:50%;left:0;height:78%;width:54px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transform:translate(0,-50%);z-index:4;will-change:transform;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));
+}
+.racer .flag{font-size:26px;line-height:1}
+.racer .name{font-size:9px;font-weight:800;margin-top:1px;
+  background:rgba(0,0,0,.55);padding:0 4px;border-radius:5px;white-space:nowrap}
+.racer.boost{animation:boost .28s ease}
+@keyframes boost{0%{filter:drop-shadow(0 0 0 var(--neon-g))}50%{filter:drop-shadow(0 0 12px var(--neon-g)) drop-shadow(0 3px 6px rgba(0,0,0,.6))}100%{}}
+
+.boost-btn{
+  position:absolute;inset:0;z-index:7;background:transparent;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;font-weight:900;opacity:.0;
+}
+.boost-btn:active{opacity:.18;background:radial-gradient(circle,rgba(255,255,255,.5),transparent 60%)}
+
+.pos-bar{position:absolute;top:0;bottom:0;left:0;width:0;z-index:2;
+  background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,0));
+  transition:width .12s linear}
+.rank-badge{position:absolute;top:4px;right:6px;z-index:5;font-size:11px;font-weight:900;
+  background:rgba(0,0,0,.5);padding:1px 7px;border-radius:8px;color:var(--neon-g)}
+
+.controls-row{display:flex;gap:10px;margin-top:10px}
+.btn{flex:1;padding:13px;border-radius:14px;font-weight:800;font-size:14px;
+  backdrop-filter:blur(6px);transition:transform .08s}
+.btn:active{transform:scale(.96)}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--card-brd)}
+.btn-primary{background:linear-gradient(135deg,var(--neon-c),#00a3ff);color:#04121a;
+  box-shadow:0 0 18px rgba(34,231,255,.45)}
+.btn.big{padding:15px;font-size:16px;margin-top:8px}
+
+/* ===== شاشة الفوز ===== */
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;
+  background:rgba(5,0,15,.78);backdrop-filter:blur(6px);padding:20px}
+.modal.hidden{display:none}
+.modal-card{text-align:center;background:linear-gradient(160deg,var(--bg2),var(--bg1));
+  border:1px solid var(--card-brd);border-radius:26px;padding:26px 24px;width:min(90%,360px);
+  box-shadow:0 0 50px rgba(255,45,149,.35);animation:cardIn .5s ease}
+@keyframes cardIn{from{transform:scale(.7) translateY(20px);opacity:0}to{}}
+.trophy{font-size:64px;animation:trophyBounce 1.2s ease infinite}
+@keyframes trophyBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.winner-label{color:var(--muted);font-size:13px;margin-top:6px}
+.winner-flag{font-size:54px;margin:8px 0}
+.winner-name{font-size:24px;font-weight:900;margin-bottom:8px;
+  background:linear-gradient(90deg,var(--neon-g),var(--neon-m));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+
+@media (min-width:560px){
+  .chat-layer{width:34%}
+  .title-row h1{font-size:24px}
+}
+
+</style>
+</head>
+<body>
+  <!-- ===== شريط البث المباشر (TikTok style) ===== -->
+  <header class="live-bar">
+    <div class="live-badge"><span class="live-dot"></span> مباشر</div>
+    <div class="viewers"><span id="eye">👁</span> <span id="viewer-count">0</span></div>
+    <div class="top-actions">
+      <button id="sound-toggle" class="icon-btn" title="الصوت">🔊</button>
+      <button id="share-btn" class="icon-btn" title="مشاركة">↗</button>
+    </div>
+  </header>
+
+  <!-- ===== منطقة الجوائز العائمة + التعليقات ===== -->
+  <div id="chat-layer" class="chat-layer" aria-hidden="true"></div>
+  <div id="gift-layer" class="gift-layer" aria-hidden="true"></div>
+  <div id="heart-layer" class="heart-layer" aria-hidden="true"></div>
+  <canvas id="confetti" class="confetti"></canvas>
+
+  <main class="game">
+    <div class="title-row">
+      <h1>🏁 سباق الدول العربية</h1>
+      <div class="sub" id="race-status">اضغط على دولة لدفعها نحو خط النهاية!</div>
+    </div>
+
+    <!-- خط النهاية العمودي -->
+    <div class="track-wrap">
+      <div id="lanes" class="lanes"></div>
+      <div class="finish-line">
+        <div class="finish-flag">🏁</div>
+        <div class="finish-tape">نهاية السباق</div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <button id="restart" class="btn btn-ghost">🔄 سباق جديد</button>
+      <button id="rush" class="btn btn-primary">⚡ تسريع جماعي</button>
+    </div>
+  </main>
+
+  <!-- ===== شاشة الفوز ===== -->
+  <div id="winner-modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="trophy">🏆</div>
+      <div class="winner-label">الفائز بالسباق</div>
+      <div id="winner-flag" class="winner-flag">🏁</div>
+      <div id="winner-name" class="winner-name">—</div>
+      <button id="play-again" class="btn btn-primary big">🎉 سباق جديد</button>
+    </div>
+  </div>
+
+  <script>
+/* ====================================================================
+   سباق الدول العربية — بث مباشر
+   محرّك سباق تفاعلي بأسلوب بثّ TikTok المباشر (محاكاة جمهور + هدايا + دردشة)
+   ==================================================================== */
+
+"use strict";
+
+/* ---------- بيانات الدول العربية ---------- */
+const COUNTRIES = [
+  {code:"DZ",name:"الجزائر",flag:"🇩🇿",c1:"#006233",c2:"#d21034",cheer:"يا الجزائر 🔥"},
+  {code:"MA",name:"المغرب",flag:"🇲🇦",c1:"#c1272d",c2:"#006233",cheer:"أسود الأطلس 🦁"},
+  {code:"TN",name:"تونس",flag:"🇹🇳",c1:"#e70013",c2:"#cfcfcf",cheer:"نسور قرطاج 🦅"},
+  {code:"LY",name:"ليبيا",flag:"🇱🇾",c1:"#222",c2:"#239e46",cheer:"ليبيا للأمام"},
+  {code:"EG",name:"مصر",flag:"🇪🇬",c1:"#d21034",c2:"#111",cheer:"يا فراعنة 👑"},
+  {code:"SD",name:"السودان",flag:"🇸🇩",c1:"#d21034",c2:"#007a3d",cheer:"سودان القوة"},
+  {code:"SA",name:"السعودية",flag:"🇸🇦",c1:"#006c35",c2:"#014d24",cheer:"الصقور الخضر"},
+  {code:"AE",name:"الإمارات",flag:"🇦🇪",c1:"#d7282f",c2:"#00732f",cheer:"الإمارات قوية"},
+  {code:"QA",name:"قطر",flag:"🇶🇦",c1:"#8a1538",c2:"#5a0f2c",cheer:"عنابي قطر"},
+  {code:"KW",name:"الكويت",flag:"🇰🇼",c1:"#007a3d",c2:"#ce1126",cheer:"أزرق الكويت"},
+  {code:"BH",name:"البحرين",flag:"🇧🇭",c1:"#c8102e",c2:"#ececec",cheer:"بحرين الحبيبة"},
+  {code:"OM",name:"عُمان",flag:"🇴🇲",c1:"#c8102e",c2:"#00884c",cheer:"عُمان الأصيلة"},
+  {code:"YE",name:"اليمن",flag:"🇾🇪",c1:"#ce1126",c2:"#111",cheer:"يا يمن الصمود"},
+  {code:"SY",name:"سوريا",flag:"🇸🇾",c1:"#ce1126",c2:"#007a3d",cheer:"سوريا الأسد"},
+  {code:"JO",name:"الأردن",flag:"🇯🇴",c1:"#ce1126",c2:"#007a3d",cheer:"الأردن أولاً"},
+  {code:"IQ",name:"العراق",flag:"🇮🇶",c1:"#cf0921",c2:"#007227",cheer:"رافدان العراق"},
+  {code:"LB",name:"لبنان",flag:"🇱🇧",c1:"#ed1c24",c2:"#d9d9d9",cheer:"أرز لبنان 🌲"},
+  {code:"PS",name:"فلسطين",flag:"🇵🇸",c1:"#e4312b",c2:"#007a3d",cheer:"فلسطين حرة 🇵🇸"},
+  {code:"MR",name:"موريتانيا",flag:"🇲🇷",c1:"#00a651",c2:"#c8102e",cheer:"موريتانيا"},
+  {code:"SO",name:"الصومال",flag:"🇸🇴",c1:"#4189dd",c2:"#dfeaff",cheer:"الصومال"},
+  {code:"DJ",name:"جيبوتي",flag:"🇩🇯",c1:"#6ab2e8",c2:"#12ad2b",cheer:"جيبوتي"},
+  {code:"KM",name:"جزر القمر",flag:"🇰🇲",c1:"#ffc400",c2:"#007a3d",cheer:"القمر"},
+];
+
+/* ---------- جمهور محاكى ---------- */
+const USERS = ["ahmed","sara_dz","khaled","nour","yassine","lina","omar","maya",
+  "user8372","riadh","amani","bilal","hadjer","ziad","rim","salma","mounir",
+  "ines","walid","farah","karim","dalila","amine","souad","reda","noussa"];
+const PHRASES = ["هيا 🔥","أبطال 💪","go go go","للأمام 👇","بطل 🏆","قوية والله",
+  "يا بطل","نتمنى الفوز","🎉🎉","نيران","لن نتنازل","مين راح يفوز؟","💯",
+  "عاشت ايديك","محظوظ اليوم","اللهم النصر","✨✨","ندعمكم"];
+const GIFTS = [
+  {e:"🌹",n:"وردة"},{e:"💎",n:"ماسة"},{e:"🦁",n:"أسد"},{e:"🏆",n:"كأس"},
+  {e:"👑",n:"تاج"},{e:"🚀",n:"صاروخ"},{e:"🎉",n:"حفلة"},{e:"🔥",n:"نار"}
+];
+const MEDALS = ["🥇","🥈","🥉"];
+
+/* ---------- حالة اللعبة ---------- */
+const state = {
+  lanes:[], raceOver:false, last:0,
+  viewers: 1200 + Math.floor(Math.random()*4000),
+  chatTimer:0, giftTimer:6, viewerTimer:0, hypeTimer:0,
+  audio:null, soundOn:true,
+};
+
+/* ---------- عناصر DOM ---------- */
+const elLanes = document.getElementById("lanes");
+const elChat = document.getElementById("chat-layer");
+const elGift = document.getElementById("gift-layer");
+const elHeart = document.getElementById("heart-layer");
+const elViewers = document.getElementById("viewer-count");
+const elStatus = document.getElementById("race-status");
+const cv = document.getElementById("confetti");
+const cx = cv.getContext("2d");
+
+/* ---------- أدوات ---------- */
+const rnd = (a,b)=>a+Math.random()*(b-a);
+const pick = arr=>arr[Math.floor(Math.random()*arr.length)];
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const shuffle = a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+function pickRacers(n){
+  // اختيار n دول مختلفة عشوائياً
+  return shuffle(COUNTRIES.slice()).slice(0,n);
+}
+
+/* ---------- بناء المضمار ---------- */
+function buildLanes(){
+  elLanes.innerHTML = "";
+  state.lanes = [];
+  const racers = pickRacers(6);
+  racers.forEach((c,i)=>{
+    const lane = document.createElement("div");
+    lane.className = "lane";
+    lane.style.setProperty("--lane-c1",c.c1);
+    lane.style.setProperty("--lane-c2",c.c2);
+    lane.innerHTML = `
+      <div class="lane-track"></div>
+      <div class="pos-bar"></div>
+      <div class="racer"><div class="flag">${c.flag}</div><div class="name">${c.name}</div></div>
+      <div class="rank-badge"></div>
+      <button class="boost-btn" aria-label="دفع ${c.name}">＋</button>`;
+    elLanes.appendChild(lane);
+
+    const obj = {
+      c, lane,
+      racer: lane.querySelector(".racer"),
+      bar: lane.querySelector(".pos-bar"),
+      rank: lane.querySelector(".rank-badge"),
+      btn: lane.querySelector(".boost-btn"),
+      pos:0, iv:0, hype: Math.random()*0.4, maxX:0
+    };
+    // دفع عبر النقر/اللمس
+    const push = e=>{e.preventDefault(); boost(obj,true);};
+    obj.btn.addEventListener("pointerdown",push);
+    state.lanes.push(obj);
+  });
+  measure();
+}
+
+function measure(){
+  state.lanes.forEach(l=>{
+    l.maxX = Math.max(40, l.lane.clientWidth - 64);
+  });
+}
+window.addEventListener("resize",measure);
+window.addEventListener("orientationchange",()=>setTimeout(measure,300));
+
+/* ---------- الدفع (نقرة لاعب أو جمهور) ---------- */
+function boost(l, fromPlayer){
+  if(state.raceOver) return;
+  l.iv += fromPlayer ? 0.16 : rnd(0.04,0.11);
+  l.iv = clamp(l.iv, 0, 0.55);
+  l.hype = clamp(l.hype + (fromPlayer?0.12:0.04), 0, 1);
+  l.racer.classList.remove("boost"); void l.racer.offsetWidth; l.racer.classList.add("boost");
+  spawnHeart(l.c.flag);
+  if(fromPlayer){
+    sfx("tap");
+    if(Math.random()<0.5){
+      spawnChat(l.c, "@"+(USERS[Math.floor(Math.random()*USERS.length)]), true);
+    }
+  }
+}
+
+/* ---------- محاكاة جمهور البث ---------- */
+function audienceTick(dt){
+  state.chatTimer -= dt;
+  state.giftTimer -= dt;
+  state.hypeTimer -= dt;
+
+  // تعليقات متدفقة
+  if(state.chatTimer<=0){
+    state.chatTimer = rnd(0.7,2.0);
+    const l = pick(state.lanes);
+    const msg = Math.random()<0.6 ? l.c.cheer : pick(PHRASES);
+    spawnChat(l.c, "@"+pick(USERS)+": "+msg, false);
+  }
+  // هدايا
+  if(state.giftTimer<=0){
+    state.giftTimer = rnd(7,15);
+    spawnGift();
+    sfx("gift");
+  }
+  // تغيّر حماس الجمهور + دفعات عشوائية
+  if(state.hypeTimer<=0){
+    state.hypeTimer = rnd(0.25,0.6);
+    state.lanes.forEach(l=>{
+      l.hype = clamp(l.hype + rnd(-0.12,0.16), 0.05, 1);
+    });
+    const n = 1 + Math.floor(Math.random()*3);
+    for(let i=0;i<n;i++){ boost(pick(state.lanes), false); }
+  }
+}
+
+/* ---------- عناصر عائمة ---------- */
+function spawnHeart(emoji){
+  const h = document.createElement("div");
+  h.className="heart";
+  h.textContent = Math.random()<0.5 ? emoji : pick(["❤️","💖","🔥","✨","👍","⭐"]);
+  h.style.left = rnd(0,30)+"px";
+  h.style.setProperty("--drift", rnd(-30,30)+"px");
+  h.style.animationDuration = rnd(2.5,4.2)+"s";
+  h.style.fontSize = rnd(16,28)+"px";
+  elHeart.appendChild(h);
+  setTimeout(()=>h.remove(), 4500);
+}
+function spawnChat(c, text, strong){
+  const m = document.createElement("div");
+  m.className="chat-msg";
+  m.innerHTML = `<b>${c.flag}</b> ${text}`;
+  elChat.appendChild(m);
+  // إبقاء آخر 6 رسائل فقط
+  while(elChat.children.length>6) elChat.firstChild.remove();
+  setTimeout(()=>m.remove(), 6000);
+}
+function spawnGift(){
+  const g = pick(GIFTS);
+  const u = pick(USERS);
+  const pop = document.createElement("div");
+  pop.className="gift-pop";
+  pop.innerHTML = `<span class="emoji">${g.e}</span>@${u} أرسل ${g.n}`;
+  elGift.appendChild(pop);
+  setTimeout(()=>pop.remove(), 2500);
+}
+
+/* ---------- عدّاد المشاهدين ---------- */
+function tickViewers(dt){
+  state.viewerTimer -= dt;
+  if(state.viewerTimer<=0){
+    state.viewerTimer = rnd(0.6,1.4);
+    state.viewers += Math.floor(rnd(-2,8));
+    state.viewers = Math.max(500, state.viewers);
+    elViewers.textContent = state.viewers.toLocaleString("en-US");
+  }
+}
+
+/* ---------- حلقة اللعبة ---------- */
+function loop(t){
+  if(state.raceOver) return;
+  const dt = Math.min(0.05, (t - state.last)/1000 || 0);
+  state.last = t;
+
+  audienceTick(dt);
+  tickViewers(dt);
+
+  // تحديث المواضع
+  state.lanes.forEach(l=>{
+    l.iv *= Math.exp(-dt/0.9);                 // تلاشي الدفعات
+    const crowd = 0.018 + l.hype*0.030;        // سرعة الجمهور المستمرة
+    const v = crowd + l.iv;
+    l.pos = clamp(l.pos + v*dt, 0, 1);
+    const px = l.pos * l.maxX;
+    l.racer.style.transform = `translate(${px}px,-50%)`;
+    l.bar.style.width = (l.pos*100)+"%";
+  });
+
+  // ترتيب لحظي
+  const order = state.lanes.slice().sort((a,b)=>b.pos-a.pos);
+  order.forEach((l,i)=>{
+    l.rank.textContent = i<3 ? MEDALS[i] : (i+1);
+    l.rank.style.background = i===0 ? "rgba(255,210,63,.9)" : "rgba(0,0,0,.5)";
+    l.rank.style.color = i===0 ? "#3a2a00" : "var(--neon-g)";
+  });
+
+  // الفحص عن الفائز
+  for(const l of order){
+    if(l.pos >= 1){ finish(l); break; }
+  }
+
+  requestAnimationFrame(loop);
+}
+
+/* ---------- النهاية / الفوز ---------- */
+function finish(winner){
+  state.raceOver = true;
+  elStatus.textContent = `انتهى السباق! 🏆`;
+  document.getElementById("winner-flag").textContent = winner.c.flag;
+  document.getElementById("winner-name").textContent = winner.c.name;
+  document.getElementById("winner-modal").classList.remove("hidden");
+  confetti();
+  sfx("win");
+}
+
+/* ---------- الكونفيتي ---------- */
+let confettiParts=[];
+function confetti(){
+  resizeCanvas();
+  confettiParts = [];
+  const colors=["#22e7ff","#ff2d95","#ffd23f","#7a1bff","#00ff9d","#fff"];
+  for(let i=0;i<160;i++){
+    confettiParts.push({
+      x: cv.width/2, y: cv.height/3,
+      vx: rnd(-7,7), vy: rnd(-12,3),
+      g: rnd(0.18,0.4), s: rnd(6,12),
+      c: pick(colors), rot: rnd(0,6.28), vr: rnd(-0.3,0.3), life:1
+    });
+  }
+  drawConfetti();
+}
+function drawConfetti(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  let alive=false;
+  confettiParts.forEach(p=>{
+    p.vy += p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= 0.006;
+    if(p.life>0 && p.y<cv.height+20){
+      alive=true;
+      cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot);
+      cx.fillStyle=p.c; cx.globalAlpha=Math.max(0,p.life);
+      cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.5);
+      cx.restore();
+    }
+  });
+  if(alive) requestAnimationFrame(drawConfetti);
+  else cx.clearRect(0,0,cv.width,cv.height);
+}
+function resizeCanvas(){cv.width=innerWidth;cv.height=innerHeight;}
+window.addEventListener("resize",resizeCanvas); resizeCanvas();
+
+/* ---------- الصوت (WebAudio) ---------- */
+function ensureAudio(){
+  if(!state.audio){
+    try{ state.audio = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  }
+  if(state.audio && state.audio.state==="suspended") state.audio.resume();
+}
+function sfx(type){
+  if(!state.soundOn) return;
+  ensureAudio(); const a=state.audio; if(!a) return;
+  const t=a.currentTime;
+  const beep=(f,d,vol=0.15,delay=0,type2="sine")=>{
+    const o=a.createOscillator(), g=a.createGain();
+    o.type=type2; o.frequency.value=f;
+    o.connect(g); g.connect(a.destination);
+    g.gain.setValueAtTime(0,t+delay);
+    g.gain.linearRampToValueAtTime(vol,t+delay+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+delay+d);
+    o.start(t+delay); o.stop(t+delay+d+0.02);
+  };
+  if(type==="tap"){ beep(rnd(520,720),0.12,0.10); }
+  else if(type==="gift"){ beep(880,0.1,0.10); beep(1320,0.16,0.08,0.08); }
+  else if(type==="win"){ [523,659,784,1046].forEach((f,i)=>beep(f,0.3,0.16,i*0.12,"triangle")); }
+}
+
+/* ---------- أزرار التحكم ---------- */
+document.getElementById("restart").addEventListener("click",startRace);
+document.getElementById("play-again").addEventListener("click",startRace);
+document.getElementById("rush").addEventListener("click",()=>{
+  if(state.raceOver) return;
+  state.lanes.forEach(l=>boost(l,true));
+  elStatus.textContent = "⚡ تسريع جماعي! دفع الجميع";
+  setTimeout(()=>{ if(!state.raceOver) elStatus.textContent="اضغط على دولة لدفعها نحو خط النهاية!";},1400);
+});
+document.getElementById("sound-toggle").addEventListener("click",e=>{
+  state.soundOn=!state.soundOn;
+  e.currentTarget.textContent = state.soundOn ? "🔊" : "🔇";
+  if(state.soundOn) sfx("tap");
+});
+document.getElementById("share-btn").addEventListener("click",async()=>{
+  const data={title:"سباق الدول العربية",text:"شجّع دولتك المفضلة في سباق الدول! 🏁",url:location.href};
+  try{ if(navigator.share) await navigator.share(data); else throw 1; }
+  catch{ elStatus.textContent="انسخ الرابط وشاركه مع أصدقائك 📋"; setTimeout(()=>elStatus.textContent="اضغط على دولة لدفعها نحو خط النهاية!",1800); }
+});
+
+/* ---------- بدء سباق ---------- */
+function startRace(){
+  state.raceOver=false;
+  document.getElementById("winner-modal").classList.add("hidden");
+  cx.clearRect(0,0,cv.width,cv.height);
+  elStatus.textContent="اضغط على دولة لدفعها نحو خط النهاية!";
+  elChat.innerHTML="";
+  buildLanes();
+  state.last=performance.now();
+  requestAnimationFrame(loop);
+}
+
+startRace();
+
+</script>
+</body>
+</html>
