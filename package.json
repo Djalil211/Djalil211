@@ -1,0 +1,1 @@
+{"name":"arab-flag-race","version":"1.0.0","private":true,"description":"سباق أعلام الدول العربية","scripts":{"start":"python3 -m http.server 4173 --bind 0.0.0.0"},"dependencies":{"@capacitor/android":"^7.4.0","@capacitor/cli":"^7.4.0","@capacitor/core":"^7.4.0"}}
