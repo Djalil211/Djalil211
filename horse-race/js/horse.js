@@ -414,17 +414,24 @@
     ctx.closePath(); ctx.fill();
   }
 
-  /* علم الجزائر 🇩🇿: نصف أخضر/أبيض + هلال ونجمة أحمران */
+  /* علم الجزائر 🇩🇿: نصف أخضر/أبيض + هلال ونجمة أحمران (هندسة مضبوطة) */
   function drawFlagDZ(ctx, w, h) {
     ctx.fillStyle = '#006233'; ctx.fillRect(0, 0, w / 2, h);
     ctx.fillStyle = '#ffffff'; ctx.fillRect(w / 2, 0, w / 2, h);
-    const cx = w * 0.47, cy = h * 0.5, R = h * 0.34;
+    const cx = w * 0.5, cy = h * 0.5, R = h * 0.30;
+    const rIn = R * 0.78, dx = R * 0.34;
+    /* نقاط تقاطع الدائرتين = رأسا القرنين */
+    const ax = (dx * dx + R * R - rIn * rIn) / (2 * dx);
+    const ay = Math.sqrt(Math.max(0, R * R - ax * ax));
+    const thA = Math.atan2(-ay, ax), thB = Math.atan2(ay, ax);       // من مركز الخارجية
+    const psA = Math.atan2(-ay, ax - dx), psB = Math.atan2(ay, ax - dx); // من مركز الداخلية
     ctx.fillStyle = '#D21034';
     ctx.beginPath();
-    ctx.arc(cx, cy, R, Math.PI / 2, Math.PI * 1.5, false);       // القوس الخارجي (يسار)
-    ctx.arc(cx + R * 0.42, cy, R * 0.86, Math.PI * 1.5, Math.PI / 2, false); // القوس الداخلي
+    ctx.arc(cx, cy, R, thA, thB, true);            // القوس الخارجي: أعلى → يسار → أسفل
+    ctx.arc(cx + dx, cy, rIn, psB, psA, false);    // القوس الداخلي: أسفل → يسار → أعلى
     ctx.closePath(); ctx.fill();
-    draw5Star(ctx, cx + R * 0.78, cy, R * 0.36, '#D21034');
+    /* النجمة الخماسية بين قرني الهلال، رأسها للأعلى */
+    draw5Star(ctx, cx + R * 0.52, cy, R * 0.34, '#D21034');
   }
 
   return {
