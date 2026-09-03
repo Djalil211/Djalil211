@@ -20,3 +20,6 @@ dist/
 
 # نظام
 .DS_Store
+
+# node
+node_modules/
